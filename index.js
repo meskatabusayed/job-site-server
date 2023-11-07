@@ -50,6 +50,12 @@ async function run() {
       res.send(result);
   })
 
+  // app.put('/jobs/:id' , async(req , res) => {
+  //   const id = req.params.id;
+  //   const filter = {_id: new ObjectId(id)};
+  //   const options = {}
+  // })
+
 // job post data
   app.get('/job' , async(req , res) => {
     let query ={};
@@ -84,13 +90,39 @@ async function run() {
     // Bids
 
     app.get('/bid' , async(req , res) => {
-      
+      const myEmail = req.query?.email;
+      const buyerEmail = req.query?.buyerEmail;
       let query ={};
-      if(req.query?.email){
-        query = { email: req.query.email }
+      if(myEmail){
+        query = { email: myEmail }
       } 
+      if(buyerEmail){
+        query = { buyerEmail: buyerEmail }
+      }
       const result = await bidCollection.find(query).toArray();
       res.send(result);
+    })
+
+  //   app.get('/bid/:id' , async(req , res) => {
+  //     const id = req.params.id;
+  //     const query = {_id: new ObjectId(id)};
+  //     const result = await jobCollection .findOne(query);
+  //     res.send(result);
+  // })
+
+
+    app.patch('/bid/:id' , async(req , res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const updateDoc = req.body
+      const option = {upsert: true}
+      const updateValuess = {
+        $set: updateDoc
+
+
+      }
+      const result = await bidCollection.updateOne(query , updateValuess , option)
+      res.send(result)
     })
 
     app.post('/bid' , async(req , res) => {
