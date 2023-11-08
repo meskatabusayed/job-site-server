@@ -37,23 +37,7 @@ const logger = async(req , res , next) => {
   next();
 }
 
-const verifyToken = async(req , res , next) => {
-  const token = req.cookies?.token;
-  //console.log('Value of token in middleware' , token)
-  if(!token){
-    return res.status(401).send({message: 'Not Authorized'})
-  }
-  jwt.verify(token , process.env.ACCESS_TOKEN_SECRET, (err , decoded) => {
-    if(err){
-      console.log(err);
-      return res.status(401).send({message: 'unauthorized'})
-    }
-    // if token is valid then it would be decoded
-    console.log('value in the token' , decoded)
-    req.user = decoded;
-    next();
-  })
-  }
+
 
 async function run() {
   try {
@@ -67,7 +51,7 @@ async function run() {
     app.post('/jwt' , logger , async(req , res) => {
       const user = req.body;
       console.log(user);
-      const token = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET , {expiresIn: '1h'})
+      const token = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET , {expiresIn: '50h'})
       res
       .cookie('token', token, {
         httpOnly: true,
@@ -118,9 +102,9 @@ async function run() {
   })
 
 // job post data
-  app.get('/job' , logger , async(req , res) => {
-    console.log('Token is' , req.cookies.token)
-   
+  app.get('/job' , logger ,  async(req , res) => {
+    
+    
     let query ={};
     if(req.query?.employerEmail){
       query = { employerEmail: req.query.employerEmail}
@@ -166,12 +150,7 @@ async function run() {
       res.send(result);
     })
 
-  //   app.get('/bid/:id' , async(req , res) => {
-  //     const id = req.params.id;
-  //     const query = {_id: new ObjectId(id)};
-  //     const result = await jobCollection .findOne(query);
-  //     res.send(result);
-  // })
+  
 
 
     app.patch('/bid/:id' , async(req , res) => {
